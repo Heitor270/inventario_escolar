@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISEPAM — Cadastrar Bem</title>
+    <script>const t=localStorage.getItem('tema')||'light';document.documentElement.setAttribute('data-theme',t);</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>Patrimônio</h2>
+            <p id="usuario-nome">Carregando...</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-item" href="dashboard.html">Dashboard</a>
+            <a class="nav-item" href="inventario.html">Inventário</a>
+            <a class="nav-item active" href="cadastrar-bem.html">Cadastrar</a>
+            <a class="nav-item" href="chamados.html">Chamados</a>
+            <a class="nav-item" href="relatorios.html">Relatórios</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" onclick="alternarTema()">🌙 Modo Escuro</button>
+            <a class="nav-item sair" onclick="sair()">Sair</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <h1 class="page-title">Novo Cadastro de Bem</h1>
+
+        <div class="form-card">
+            <div class="form-group">
+                <label>Data de Entrada:</label>
+                <input type="date" id="data_aquisicao" />
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="numero_patrimonio" placeholder="Número do Patrimônio *" />
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="nome" placeholder="Nome do Item *" />
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="descricao" placeholder="Descrição" />
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="localizacao" placeholder="Localização Inicial" />
+            </div>
+
+            <div class="form-group">
+                <label>Estado de Conservação:</label>
+                <select id="estado_conservacao">
+                    <option value="Novo">Novo</option>
+                    <option value="Bom">Bom</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Ruim">Ruim</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select id="categoria">
+                    <option value="Mobiliário">Mobiliário</option>
+                    <option value="Eletrônico">Eletrônico</option>
+                    <option value="Veículo">Veículo</option>
+                    <option value="Equipamento">Equipamento</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="status" placeholder="Status" value="disponivel" />
+            </div>
+
+            <button class="btn-save" onclick="salvarBem()" style="width: 100%; padding: 13px;">Salvar Bem</button>
+            <p class="erro" id="erro" style="margin-top: 10px;"></p>
+        </div>
+    </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+function salvarBem() {
+    const dados = {
+        numero_patrimonio: document.getElementById('numero_patrimonio').value,
+        nome: document.getElementById('nome').value,
+        descricao: document.getElementById('descricao').value,
+        localizacao: document.getElementById('localizacao').value,
+        estado_conservacao: document.getElementById('estado_conservacao').value,
+        categoria: document.getElementById('categoria').value,
+        status: document.getElementById('status').value,
+        data_aquisicao: document.getElementById('data_aquisicao').value
+    };
+
+    if (!dados.numero_patrimonio || !dados.nome) {
+        document.getElementById('erro').textContent = 'Número do Patrimônio e Nome são obrigatórios!';
+        return;
+    }
+
+    fetch('http://127.0.0.1:5000/equipamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.sucesso) {
+            alert('Bem cadastrado com sucesso!');
+            window.location.href = 'inventario.html';
+        } else {
+            document.getElementById('erro').textContent = data.mensagem;
+        }
+    })
+    .catch(() => {
+        document.getElementById('erro').textContent = 'Erro ao conectar com o servidor.';
+    });
+}
+</script>
+</body>
+</html>
